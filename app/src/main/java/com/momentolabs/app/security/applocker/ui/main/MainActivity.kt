@@ -4,6 +4,7 @@ import android.Manifest
 import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
@@ -15,6 +16,7 @@ import androidx.viewpager.widget.ViewPager
 import com.google.android.material.navigation.NavigationView
 import com.momentolabs.app.security.applocker.R
 import com.momentolabs.app.security.applocker.databinding.ActivityMainBinding
+import com.momentolabs.app.security.applocker.service.CallReceiverService
 import com.momentolabs.app.security.applocker.ui.BaseActivity
 import com.momentolabs.app.security.applocker.ui.main.analytics.MainActivityAnalytics
 import com.momentolabs.app.security.applocker.ui.newpattern.CreateNewPatternActivity
@@ -86,6 +88,12 @@ class MainActivity : BaseActivity<MainViewModel>(),
 
         if (phoneStatePermission != PackageManager.PERMISSION_GRANTED)
             askPermissions()
+
+        val intent = Intent(this, CallReceiverService::class.java)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+            startForegroundService(intent)
+        else
+            startService(intent)
     }
 
     private fun askPermissions() {
