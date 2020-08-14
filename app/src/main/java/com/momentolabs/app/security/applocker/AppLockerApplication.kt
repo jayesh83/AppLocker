@@ -1,9 +1,11 @@
 package com.momentolabs.app.security.applocker
 
+import android.Manifest
 import android.content.Context
+import android.content.pm.PackageManager
+import androidx.core.app.ActivityCompat
 import androidx.multidex.MultiDex
 import com.bugsnag.android.Bugsnag
-import com.facebook.FacebookSdk
 import com.facebook.soloader.SoLoader
 import com.facebook.stetho.Stetho
 import com.google.android.gms.ads.MobileAds
@@ -15,7 +17,6 @@ import dagger.android.AndroidInjector
 import dagger.android.DaggerApplication
 
 class AppLockerApplication : DaggerApplication() {
-
     override fun applicationInjector(): AndroidInjector<out DaggerApplication> =
         DaggerAppComponent.builder().create(this)
 
@@ -29,6 +30,7 @@ class AppLockerApplication : DaggerApplication() {
         SoLoader.init(this, false)
         WorkerStarter.startServiceCheckerWorker()
     }
+
 
     override fun attachBaseContext(base: Context?) {
         super.attachBaseContext(base)

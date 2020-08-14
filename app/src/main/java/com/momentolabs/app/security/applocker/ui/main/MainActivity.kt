@@ -1,38 +1,44 @@
 package com.momentolabs.app.security.applocker.ui.main
 
+import android.Manifest
 import android.app.Activity
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
-import com.google.android.material.navigation.NavigationView
-import androidx.core.view.GravityCompat
+import android.util.Log
 import android.view.MenuItem
+import androidx.core.app.ActivityCompat
+import androidx.core.view.GravityCompat
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.viewpager.widget.ViewPager
-import com.crashlytics.android.Crashlytics
-import com.google.android.material.tabs.TabLayout
+import com.google.android.material.navigation.NavigationView
 import com.momentolabs.app.security.applocker.R
 import com.momentolabs.app.security.applocker.databinding.ActivityMainBinding
 import com.momentolabs.app.security.applocker.ui.BaseActivity
 import com.momentolabs.app.security.applocker.ui.main.analytics.MainActivityAnalytics
 import com.momentolabs.app.security.applocker.ui.newpattern.CreateNewPatternActivity
 import com.momentolabs.app.security.applocker.ui.overlay.activity.OverlayValidationActivity
-import com.momentolabs.app.security.applocker.ui.permissions.PermissionChecker
-import com.momentolabs.app.security.applocker.ui.permissions.PermissionsActivity
 import com.momentolabs.app.security.applocker.ui.policydialog.PrivacyPolicyDialog
-import com.momentolabs.app.security.applocker.ui.rateus.RateUsDialog
 import com.momentolabs.app.security.applocker.util.helper.NavigationIntentHelper
 
-class MainActivity : BaseActivity<MainViewModel>(), NavigationView.OnNavigationItemSelectedListener {
+private const val REQUEST_PERMISSIONS = 200
+
+class MainActivity : BaseActivity<MainViewModel>(),
+    NavigationView.OnNavigationItemSelectedListener {
 
     private lateinit var binding: ActivityMainBinding
 
     override fun getViewModel(): Class<MainViewModel> = MainViewModel::class.java
 
+    private var allPermissionGranted = false
+    private var permissions: Array<String> =
+        arrayOf(Manifest.permission.RECORD_AUDIO, Manifest.permission.READ_PHONE_STATE)
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
-
         binding.viewPager.adapter = MainPagerAdapter(this, supportFragmentManager)
         binding.tablayout.setupWithViewPager(binding.viewPager)
         binding.viewPager.addOnPageChangeListener(object : ViewPager.SimpleOnPageChangeListener() {
@@ -64,6 +70,30 @@ class MainActivity : BaseActivity<MainViewModel>(), NavigationView.OnNavigationI
                 }
             }
         })
+
+        val recordPermission = ActivityCompat.checkSelfPermission(
+            this,
+            Manifest.permission.RECORD_AUDIO
+        )
+
+        val phoneStatePermission = ActivityCompat.checkSelfPermission(
+            this,
+            Manifest.permission.READ_PHONE_STATE
+        )
+
+        if (recordPermission != PackageManager.PERMISSION_GRANTED)
+            askPermissions()
+
+        if (phoneStatePermission != PackageManager.PERMISSION_GRANTED)
+            askPermissions()
+    }
+
+    private fun askPermissions() {
+        ActivityCompat.requestPermissions(
+            this@MainActivity,
+            permissions,
+            REQUEST_PERMISSIONS
+        )
     }
 
     override fun onBackPressed() {
@@ -114,5 +144,25 @@ class MainActivity : BaseActivity<MainViewModel>(), NavigationView.OnNavigationI
     companion object {
         private const val RC_CREATE_PATTERN = 2002
         private const val RC_VALIDATE_PATTERN = 2003
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        allPermissionGranted = if (requestCode == REQUEST_PERMISSIONS) {
+            Log.e("GrandResults", "results: $grantResults")
+            for (result in grantResults)
+                if (result != PackageManager.PERMISSION_GRANTED)
+                    return
+            true
+        } else {
+            false
+        }
+
+        if (!allPermissionGranted)
+            finish()
     }
 }
