@@ -4,14 +4,16 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.os.Build
-import android.telephony.TelephonyManager.*
+import android.telephony.TelephonyManager.EXTRA_STATE
+import android.telephony.TelephonyManager.EXTRA_STATE_RINGING
+import android.telephony.TelephonyManager.EXTRA_STATE_OFFHOOK
+import android.telephony.TelephonyManager.EXTRA_STATE_IDLE
 import android.util.Log
-import android.widget.Toast
 import androidx.core.content.ContextCompat
 import com.momentolabs.app.security.applocker.service.RecorderService
 
 class CallReceiver : BroadcastReceiver() {
-    companion object{
+    companion object {
         private var idle: Boolean = false
         private var rang: Boolean = false
         private var offhook: Boolean = false
@@ -20,21 +22,17 @@ class CallReceiver : BroadcastReceiver() {
     }
 
     override fun onReceive(context: Context?, intent: Intent?) {
-        Toast.makeText(context, "There's Call", Toast.LENGTH_LONG).show()
-        if (!intent?.action.equals("android.intent.action.PHONE_STATE")) {
-            context?.also {
-                Toast.makeText(context, "Receiver", Toast.LENGTH_LONG).show()
-            }
+        if (!intent?.action.equals("android.intent.action.PHONE_STATE"))
             return
-        }
-        Log.e("State", "-> $rang, $offhook, $idle")
+
+        logger("State", "-> $rang, $offhook, $idle")
 
         when (intent?.getStringExtra(EXTRA_STATE)) {
             EXTRA_STATE_RINGING -> {
                 rang = true
                 if (ongoingCall)
                     anotherCall = true
-                Log.e("Ringing", "Yes")
+                logger("Ringing", "Yes")
             }
 
             EXTRA_STATE_OFFHOOK -> {
@@ -46,7 +44,7 @@ class CallReceiver : BroadcastReceiver() {
                 }
 
                 if (rang && offhook) {
-                    Log.e("Incoming", "Talking")
+                    logger("incoming", "Talking")
                     ongoingCall = true
                     startRecorder(context)
                 }
@@ -54,41 +52,44 @@ class CallReceiver : BroadcastReceiver() {
                 if (!rang && offhook) {
                     ongoingCall = true
                     startRecorder(context)
-                    Log.e("Outgoing", "outgoing yes")
+                    logger("Outgoing", "Outgoing yes")
                 }
 
             }
 
             EXTRA_STATE_IDLE -> {
                 idle = true
-
-                Log.e("Idle", "Yes")
+                logger("Idle", "Yes")
                 if (rang && offhook) {
-                    Log.e("Cut", "talked and cutted at last")
+                    logger("Cut", "Talked and cut at last")
                     ongoingCall = false
                     stopRecorder(context)
                 }
 
                 if (rang && !offhook)
-                    Log.e("Cut", "cutted call or didn't pickup or caller cutted the call")
+                    logger("Cut", "Cut call or didn't pickup or caller cut the call")
 
                 if (!rang && offhook && idle) {
-                    Log.e(
+                    logger(
                         "Cut",
-                        "outgoing and talked at last cutted or recepient cutted the call no talks"
+                        "Outgoing and talked at last cut or recipient cut the call, no talks"
                     )
                     ongoingCall = false
                     stopRecorder(context)
                 }
 
                 if (!rang && !offhook && idle)
-                    Log.e("Cut", "outgoing and didn't talked at last cutted")
+                    logger("Cut", "outgoing and didn't talked at last cut")
 
                 rang = false
                 offhook = false
                 idle = false
             }
         }
+    }
+
+    private fun logger(tag: String, msg: String) {
+        Log.e(tag, msg)
     }
 
     private fun startRecorder(context: Context?) {

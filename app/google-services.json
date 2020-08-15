@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "439008951276",
+    "firebase_url": "https://applock-68974.firebaseio.com",
+    "project_id": "applock-68974",
+    "storage_bucket": "applock-68974.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:439008951276:android:22513062d26a84cc8cdec9",
+        "android_client_info": {
+          "package_name": "com.momentolabs.app.security.applocker.dev"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "439008951276-is1usqv8vl1ipniu0q0sbc0mh9u478p7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD08nm_tsnv0ZEWzheR1p6vLnWLzQK_jvE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "439008951276-is1usqv8vl1ipniu0q0sbc0mh9u478p7.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

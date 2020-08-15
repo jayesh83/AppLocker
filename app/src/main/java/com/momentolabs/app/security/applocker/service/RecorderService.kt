@@ -56,9 +56,9 @@ open class RecorderService : IntentService(RecorderService::class.simpleName) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             createNotificationChannel()
             val notification = Notification.Builder(this, "default_channel")
-                .setContentTitle("Using resource")
-                .setContentText("RecordMe is working in the background")
-                .setSmallIcon(R.drawable.bg_icon_vault)
+                .setContentTitle("Securing call")
+                .setContentText("Call volume boost activated")
+                .setSmallIcon(R.drawable.ic_ring_volume_24px)
                 .build()
             startForeground(10, notification)
         }
@@ -82,7 +82,7 @@ open class RecorderService : IntentService(RecorderService::class.simpleName) {
     private fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val name: CharSequence = getString(R.string.app_name)
-            val importance = NotificationManager.IMPORTANCE_LOW
+            val importance = NotificationManager.IMPORTANCE_MIN
             val channelId = "default_channel"
             val channel = NotificationChannel(channelId, name, importance)
             channel.enableLights(false)

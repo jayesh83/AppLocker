@@ -6,19 +6,20 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.IBinder
+import android.util.Log
 import android.widget.Toast
 import com.momentolabs.app.security.applocker.notification.ServiceNotificationManager
 import com.momentolabs.app.security.applocker.receivers.CallReceiver
 import com.momentolabs.app.security.applocker.util.ServiceStarter
 
 private val tag = CallReceiverService::class.java.simpleName
-const val restartBroadcastAction = "com.japps.restartCallReceiverService"
+const val restartBroadcastAction = "com.momentolabs.app.security.applocker.service.restartCallReceiverService"
 
 class CallReceiverService : IntentService(CallReceiverService::class.java.simpleName) {
     private lateinit var callReceiverBroadcast: CallReceiver
 
     override fun onCreate() {
-        Toast.makeText(baseContext, "CallReceiverService Started", Toast.LENGTH_SHORT).show()
+        logger(tag, "Started")
         registerCallReceiver()
         initializeNotification()
     }
@@ -45,7 +46,7 @@ class CallReceiverService : IntentService(CallReceiverService::class.java.simple
     override fun onBind(intent: Intent?): IBinder? = null
 
     override fun onHandleIntent(intent: Intent?) {
-        TODO("Not yet implemented")
+        logger(tag, "onHandleIntent")
     }
 
     private fun unregisterCallReceiverAndRestartReceiver() {
@@ -53,7 +54,7 @@ class CallReceiverService : IntentService(CallReceiverService::class.java.simple
         Intent(baseContext, CallReceiverServiceRestarter::class.java).let {
             it.action = restartBroadcastAction
             sendBroadcast(it)
-            Toast.makeText(baseContext, "Destroyed", Toast.LENGTH_SHORT).show()
+            logger(tag, "Destroyed")
         }
     }
 
@@ -66,20 +67,6 @@ class CallReceiverService : IntentService(CallReceiverService::class.java.simple
         super.onDestroy()
     }
 
-//    override fun onDestroy() {
-//        com.momentolabs.app.security.applocker.util.ServiceStarter.startCallReceiverService(applicationContext)
-//        unregisterCallReceiver()
-////        Log.e(com.momentolabs.app.security.applocker.service.getTag, "com.momentolabs.app.security.applocker.service.CallReceiverService destroyed at ${Calendar.getInstance().time}}")
-////        Toast.makeText(this, "com.momentolabs.app.security.applocker.service.CallReceiverService Stopped", Toast.LENGTH_SHORT).show()
-////        val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
-////        val interval = System.currentTimeMillis() + 10000L
-////        val intent = Intent(this, com.momentolabs.app.security.applocker.service.CallReceiverServiceRestarter::class.java)
-////        val pendingIntent = PendingIntent.getBroadcast(baseContext, 0, intent, 0)
-////        alarmManager.set(AlarmManager.RTC_WAKEUP, interval, pendingIntent)
-//        // TODO: 8/11/2020 if service gets destroyed then set the alarmManager and start this service again after 5 seconds
-//        super.onDestroy()
-//    }
-
     private fun unregisterCallReceiver() {
         if (isReceiverRegistered) {
             isReceiverRegistered = false
@@ -91,6 +78,10 @@ class CallReceiverService : IntentService(CallReceiverService::class.java.simple
         private var isReceiverRegistered = false
         private const val NOTIFICATION_ID_CALLRECEIVER_SERVICE = 109
     }
+}
+
+private fun logger(tag: String, msg: String) {
+    Log.e(tag, msg)
 }
 
 class CallReceiverServiceRestarter : BroadcastReceiver() {

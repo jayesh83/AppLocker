@@ -11,7 +11,6 @@ import android.provider.Settings
 import androidx.core.app.NotificationCompat
 import com.momentolabs.app.security.applocker.R
 
-
 class ServiceNotificationManager(val context: Context) {
 
     fun createNotification(): Notification {
@@ -25,9 +24,9 @@ class ServiceNotificationManager(val context: Context) {
             PendingIntent.getActivity(context, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT)
 
         return NotificationCompat.Builder(context, CHANNEL_ID_CALLRECEIVER_SERVICE)
-            .setSmallIcon(R.drawable.ic_locked_24px)
-            .setContentTitle("Protecting apps")
-            .setContentText("You may hide this notification, click me")
+            .setSmallIcon(R.drawable.ic_call_blocker)
+            .setContentTitle("Blocking unwanted calls")
+            .setContentText("You may hide this notification by clicking it")
             .setPriority(NotificationCompat.PRIORITY_MIN)
             .setContentIntent(resultPendingIntent)
             .build()
@@ -35,9 +34,9 @@ class ServiceNotificationManager(val context: Context) {
 
     private fun createAppLockerServiceChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val name = "name"
-            val descriptionText = "description"
-            val importance = android.app.NotificationManager.IMPORTANCE_LOW
+            val name = "Call blocker"
+            val descriptionText = "Notifying when call from blocked number arrives"
+            val importance = NotificationManager.IMPORTANCE_MIN
             val channel =
                 NotificationChannel(CHANNEL_ID_CALLRECEIVER_SERVICE, name, importance).apply {
                     description = descriptionText

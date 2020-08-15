@@ -1,9 +1,6 @@
 package com.momentolabs.app.security.applocker
 
-import android.Manifest
 import android.content.Context
-import android.content.pm.PackageManager
-import androidx.core.app.ActivityCompat
 import androidx.multidex.MultiDex
 import com.bugsnag.android.Bugsnag
 import com.facebook.soloader.SoLoader
@@ -30,7 +27,6 @@ class AppLockerApplication : DaggerApplication() {
         SoLoader.init(this, false)
         WorkerStarter.startServiceCheckerWorker()
     }
-
 
     override fun attachBaseContext(base: Context?) {
         super.attachBaseContext(base)
